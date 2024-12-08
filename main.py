@@ -1,20 +1,20 @@
-from langchain_ollama import OllamaLLM
-from langchain.prompts import PromptTemplate
+import langchain_helper as lch
+import streamlit as st
 
-def generate_pet_name(animal_type):
-    llm = OllamaLLM(base_url="http://localhost:11434", model="phi3", format="json")
+st.title("Pet Name Generator")
 
-    prompt_template = PromptTemplate(
-        input_variables=["animal_type"],
-        template="I have a {animal_type} pet and I want a cool name for it. Suggest me five cool names for it.",
-    )
+animal_type = st.sidebar.text_input("Enter the type of pet:")
 
-    prompt = prompt_template.format(animal_type=animal_type)
+if animal_type :
+    color_label = f"Enter the color of the {animal_type}"
+    color = st.sidebar.selectbox(color_label, ["White" , "Black", "Brown", "Gray", "Blue", "Green", "Other"])
 
-    response = llm.invoke(prompt)
-
-    return response
-
-if __name__ == "__main__":
-    animal_type = input("Enter the type of pet: ")
-    print(generate_pet_name(animal_type))
+if st.button("Generate Name"):
+    st.write(f"Generating pet names for {animal_type} with color {color}...")
+    name = lch.generate_pet_name(animal_type, color)
+    if "names" in name:
+        for i, pet_name in enumerate(name["names"], 1):
+                st.write(f"{i}. {pet_name}")
+    else:
+        st.error("Could not generate names.")
+        
